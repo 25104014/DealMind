@@ -1,0 +1,1509 @@
+/* ============================================================
+   DEALMIND — PREMIUM VIBRANT UI
+   Razorpay-inspired | AI-powered | Modern & Professional
+   ============================================================ */
+
+
+/* ============================================================
+   GLOBAL APPLICATION BACKGROUND
+   ============================================================ */
+
+.stApp {
+    background:
+        radial-gradient(circle at 5% 10%, rgba(15, 77, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 95% 10%, rgba(139, 92, 246, 0.16), transparent 30%),
+        radial-gradient(circle at 50% 95%, rgba(34, 197, 94, 0.12), transparent 35%),
+        linear-gradient(
+            135deg,
+            #f8faff 0%,
+            #eef3ff 30%,
+            #f8f5ff 65%,
+            #f2fff8 100%
+        );
+
+    background-attachment: fixed;
+    color: #111827;
+    min-height: 100vh;
+}
+
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
+.block-container {
+    max-width: 1280px;
+    padding-top: 2.2rem;
+    padding-bottom: 4rem;
+}
+
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+html,
+body,
+[data-testid="stAppViewContainer"] {
+    font-family:
+        "Inter",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+/* Main headings */
+
+h1,
+h2,
+h3,
+h4 {
+    color: #101828 !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.035em;
+}
+
+
+h1 {
+    font-size: 3rem !important;
+    line-height: 1.15 !important;
+}
+
+
+h2 {
+    font-size: 2rem !important;
+}
+
+
+h3 {
+    font-size: 1.5rem !important;
+}
+
+
+h4 {
+    font-size: 1.15rem !important;
+}
+
+
+/* Normal text */
+
+p,
+label,
+.stMarkdown,
+.stCaption {
+    color: #475467;
+    font-size: 1.02rem;
+    line-height: 1.65;
+}
+
+
+/* ============================================================
+   STEPPER NAVIGATION
+   ============================================================ */
+
+.stepper-wrapper {
+    position: relative;
+    margin-bottom: 12px;
+    padding: 14px 10px;
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.85),
+            rgba(244,247,255,0.75)
+        );
+
+    backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255,255,255,0.8);
+
+    box-shadow:
+        0 12px 35px rgba(15, 77, 255, 0.08);
+}
+
+
+.step-indicator {
+    text-align: center;
+    padding-bottom: 6px;
+    transition: 0.3s ease;
+}
+
+
+.step-circle {
+    width: 54px;
+    height: 54px;
+
+    margin: 0 auto 9px auto;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.45rem;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8faff,
+            #e7edff
+        );
+
+    border: 2px solid #d8e1ff;
+
+    box-shadow:
+        0 7px 16px rgba(15, 77, 255, 0.08);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.step-label {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #667085;
+    letter-spacing: 0.01em;
+}
+
+
+/* Active step */
+
+.step-indicator.active .step-circle {
+    background:
+        linear-gradient(
+            135deg,
+            #0f4dff,
+            #663cff,
+            #0f4dff
+        );
+
+    background-size: 200% 200%;
+
+    border-color: #0f4dff;
+
+    color: #ffffff;
+
+    transform: scale(1.15);
+
+    box-shadow:
+        0 0 0 8px rgba(15, 77, 255, 0.08),
+        0 12px 30px rgba(15, 77, 255, 0.42);
+
+    animation:
+        activeGradient 3s ease infinite,
+        pulseStep 1.8s ease-in-out infinite;
+}
+
+
+.step-indicator.active .step-label {
+    color: #0f31c9;
+    font-weight: 900;
+}
+
+
+.step-indicator.done .step-circle {
+    background:
+        linear-gradient(
+            135deg,
+            #16a34a,
+            #22c55e
+        );
+
+    border-color: #16a34a;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 20px rgba(34, 197, 94, 0.25);
+}
+
+
+.step-indicator.done .step-label {
+    color: #15803d;
+}
+
+
+/* Hidden navigation buttons */
+
+div[data-testid="column"] .stButton button {
+    opacity: 0;
+    height: 6px;
+    min-height: 6px;
+    margin-top: -14px;
+    padding: 0;
+}
+
+
+div[data-testid="column"] .stButton button:hover {
+    opacity: 0.05;
+    transform: none;
+}
+
+
+/* ============================================================
+   HERO / QUOTE BANNER
+   ============================================================ */
+
+.razorpay-quote-section {
+    position: relative;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 64px 48px;
+
+    margin: 20px 0 30px 0;
+
+    text-align: center;
+
+    overflow: hidden;
+
+    border-radius: 32px;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(15, 77, 255, 0.20),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 90% 15%,
+            rgba(139, 92, 246, 0.18),
+            transparent 30%
+        ),
+
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.96),
+            rgba(238,243,255,0.92),
+            rgba(248,245,255,0.96)
+        );
+
+    border:
+        1px solid rgba(255,255,255,0.9);
+
+    box-shadow:
+        0 25px 60px rgba(15, 77, 255, 0.13);
+
+    animation:
+        heroAppear 0.7s ease;
+}
+
+
+/* Decorative glowing circles */
+
+.razorpay-quote-section::before {
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    top: -140px;
+    left: -100px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(15, 77, 255, 0.12);
+
+    filter: blur(20px);
+}
+
+
+.razorpay-quote-section::after {
+    content: "";
+
+    position: absolute;
+
+    width: 240px;
+    height: 240px;
+
+    bottom: -150px;
+    right: -100px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(139, 92, 246, 0.12);
+
+    filter: blur(20px);
+}
+
+
+.quote-label {
+    position: relative;
+    z-index: 2;
+
+    display: inline-block;
+
+    padding: 9px 20px;
+
+    margin-bottom: 20px;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e4ebff,
+            #ede9fe
+        );
+
+    color: #163fc7 !important;
+
+    font-size: 0.78rem !important;
+
+    font-weight: 900 !important;
+
+    letter-spacing: 2px;
+
+    border:
+        1px solid rgba(15, 77, 255, 0.15);
+}
+
+
+.razorpay-quote-section h1 {
+    position: relative;
+    z-index: 2;
+
+    color: #101828 !important;
+
+    font-size: 3.1rem !important;
+
+    font-weight: 900 !important;
+
+    line-height: 1.2;
+
+    margin-bottom: 20px !important;
+}
+
+
+.razorpay-quote-section p {
+    position: relative;
+    z-index: 2;
+
+    max-width: 800px;
+
+    margin:
+        0 auto 28px auto !important;
+
+    font-size: 1.15rem !important;
+
+    line-height: 1.8;
+
+    color: #475467 !important;
+}
+
+
+.quote-highlights {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.quote-highlights span {
+    color: #9db3ff;
+}
+
+
+.tag-pill {
+    padding: 11px 21px;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #eef2ff
+        );
+
+    color: #163fc7;
+
+    font-weight: 800;
+
+    font-size: 0.92rem;
+
+    border:
+        1px solid #dbe4ff;
+
+    box-shadow:
+        0 6px 18px rgba(15, 77, 255, 0.08);
+
+    transition: all 0.25s ease;
+}
+
+
+.tag-pill:hover {
+    transform:
+        translateY(-4px)
+        scale(1.03);
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f4dff,
+            #5b35f5
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 14px 28px rgba(15, 77, 255, 0.28);
+}
+
+
+/* ============================================================
+   FEATURE CARDS
+   ============================================================ */
+
+.feature-card {
+    position: relative;
+
+    height: 100%;
+
+    padding: 30px 22px;
+
+    text-align: center;
+
+    overflow: hidden;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.98),
+            rgba(246,248,255,0.96)
+        );
+
+    border:
+        1px solid rgba(220,228,255,0.9);
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.07);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.feature-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0f4dff,
+            #8b5cf6,
+            #22c55e
+        );
+}
+
+
+.feature-card:hover {
+    transform:
+        translateY(-8px);
+
+    box-shadow:
+        0 22px 45px rgba(15, 77, 255, 0.16);
+}
+
+
+.feature-icon {
+    font-size: 2.6rem;
+
+    margin-bottom: 14px;
+
+    animation:
+        iconFloat 3s ease-in-out infinite;
+}
+
+
+.feature-card h4 {
+    color: #101828 !important;
+
+    font-weight: 900;
+
+    font-size: 1.18rem;
+
+    margin-bottom: 10px;
+}
+
+
+.feature-card p {
+    color: #667085 !important;
+
+    font-size: 0.96rem;
+}
+
+
+/* ============================================================
+   WALKING BUYER ANIMATION
+   ============================================================ */
+
+.walk-track {
+    position: relative;
+
+    width: 100%;
+
+    height: 76px;
+
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e8efff,
+            #f7f8ff,
+            #f0ecff,
+            #e8efff
+        );
+
+    background-size: 300% 100%;
+
+    border:
+        1px solid #cbd7ff;
+
+    box-shadow:
+        0 8px 22px rgba(15, 77, 255, 0.08);
+
+    animation:
+        trackShine 8s linear infinite;
+}
+
+
+.walking-figure {
+    position: absolute;
+
+    top: 13px;
+
+    left: -60px;
+
+    font-size: 2.4rem;
+
+    animation:
+        walkAcross 5s linear infinite;
+}
+
+
+.walk-caption {
+    position: absolute;
+
+    right: 20px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    font-size: 0.9rem;
+
+    font-weight: 800;
+
+    color: #344054;
+}
+
+
+@keyframes walkAcross {
+
+    0% {
+        left: -60px;
+        transform: scaleX(1);
+    }
+
+    48% {
+        transform: scaleX(1);
+    }
+
+    50% {
+        transform: scaleX(-1);
+    }
+
+    98% {
+        left: calc(100% + 20px);
+        transform: scaleX(-1);
+    }
+
+    100% {
+        left: calc(100% + 20px);
+        transform: scaleX(-1);
+    }
+}
+
+
+/* ============================================================
+   METRIC CARDS
+   ============================================================ */
+
+[data-testid="stMetric"] {
+    position: relative;
+
+    padding: 20px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f5f7ff
+        );
+
+    border:
+        1px solid #e0e7ff;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.07);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+[data-testid="stMetric"]::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 5px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            180deg,
+            #0f4dff,
+            #8b5cf6
+        );
+}
+
+
+[data-testid="stMetric"]:hover {
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 18px 38px rgba(15, 77, 255, 0.14);
+}
+
+
+[data-testid="stMetricLabel"] {
+    font-weight: 800 !important;
+
+    color: #667085 !important;
+}
+
+
+[data-testid="stMetricValue"] {
+    font-size: 1.7rem !important;
+
+    font-weight: 900 !important;
+
+    color: #0f31c9 !important;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.stButton > button {
+    border-radius: 14px;
+
+    font-weight: 800;
+
+    font-size: 1rem;
+
+    min-height: 52px;
+
+    letter-spacing: 0.01em;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.stButton > button:hover {
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 26px rgba(15, 23, 42, 0.15);
+}
+
+
+.stButton > button[kind="primary"] {
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f4dff,
+            #5134e8,
+            #8b5cf6
+        );
+
+    background-size: 200% 200%;
+
+    border: none;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 12px 28px rgba(15, 77, 255, 0.32);
+
+    animation:
+        activeGradient 5s ease infinite;
+}
+
+
+.stButton > button[kind="primary"]::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+
+    left: -100%;
+
+    width: 60%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.35),
+            transparent
+        );
+
+    transform:
+        skewX(-20deg);
+
+    transition: 0.5s;
+}
+
+
+.stButton > button[kind="primary"]:hover::before {
+    left: 150%;
+}
+
+
+.stButton > button[kind="primary"]:hover {
+    box-shadow:
+        0 18px 36px rgba(15, 77, 255, 0.42);
+}
+
+
+/* ============================================================
+   INPUT FIELDS
+   ============================================================ */
+
+input,
+textarea {
+    border-radius: 12px !important;
+
+    font-size: 1rem !important;
+
+    font-weight: 600 !important;
+}
+
+
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stTextArea"] textarea {
+    background:
+        rgba(255,255,255,0.92) !important;
+
+    border:
+        1px solid #dbe4ff !important;
+
+    box-shadow:
+        0 4px 12px rgba(15, 77, 255, 0.04);
+
+    transition:
+        all 0.25s ease !important;
+}
+
+
+[data-testid="stTextInput"] input:focus,
+[data-testid="stNumberInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus {
+    border:
+        1px solid #0f4dff !important;
+
+    box-shadow:
+        0 0 0 4px rgba(15, 77, 255, 0.10) !important;
+}
+
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+
+.status-badge {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    border-radius: 16px;
+
+    text-align: center;
+
+    font-weight: 900;
+
+    font-size: 1.08rem;
+
+    letter-spacing: 0.8px;
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+
+.status-negotiating {
+    background:
+        linear-gradient(
+            135deg,
+            #fff7d6,
+            #fef3c7
+        );
+
+    color: #92400e !important;
+
+    border:
+        1px solid #fcd34d;
+
+    animation:
+        negotiatingPulse 1.8s ease-in-out infinite;
+}
+
+
+.status-accepted {
+    background:
+        linear-gradient(
+            135deg,
+            #dcfce7,
+            #f0fdf4
+        );
+
+    color: #166534 !important;
+
+    border:
+        1px solid #86efac;
+}
+
+
+.status-rejected {
+    background:
+        linear-gradient(
+            135deg,
+            #fee2e2,
+            #fff1f2
+        );
+
+    color: #991b1b !important;
+
+    border:
+        1px solid #fca5a5;
+}
+
+
+@keyframes negotiatingPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.01);
+        box-shadow:
+            0 12px 30px rgba(245, 158, 11, 0.18);
+    }
+}
+
+
+/* ============================================================
+   CHAT SECTION
+   ============================================================ */
+
+[data-testid="stChatMessage"] {
+    border-radius: 18px;
+
+    padding: 16px;
+
+    margin-bottom: 14px;
+
+    border:
+        1px solid rgba(219,228,255,0.75);
+
+    box-shadow:
+        0 7px 18px rgba(15, 23, 42, 0.05);
+
+    animation:
+        chatAppear 0.4s ease;
+}
+
+
+@keyframes chatAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ============================================================
+   PAYMENT SUCCESS CARD
+   ============================================================ */
+
+.payment-success-card {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    margin-top: 28px;
+
+    padding: 58px 30px;
+
+    text-align: center;
+
+    border-radius: 30px;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(34,197,94,0.22),
+            transparent 25%
+        ),
+
+        radial-gradient(
+            circle at 85% 20%,
+            rgba(15,77,255,0.15),
+            transparent 28%
+        ),
+
+        linear-gradient(
+            135deg,
+            #ecfdf5,
+            #ffffff,
+            #effcf5
+        );
+
+    border:
+        1px solid #bbf7d0;
+
+    box-shadow:
+        0 25px 60px rgba(22, 163, 74, 0.14);
+
+    animation:
+        paymentSuccessAppear 0.7s ease;
+}
+
+
+.payment-success-card::before {
+    content: "✦";
+
+    position: absolute;
+
+    top: 25px;
+    right: 45px;
+
+    font-size: 3rem;
+
+    color: rgba(34,197,94,0.25);
+
+    animation:
+        sparkle 2s ease-in-out infinite;
+}
+
+
+.success-icon {
+    width: 88px;
+    height: 88px;
+
+    margin:
+        0 auto 24px auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #16a34a,
+            #22c55e,
+            #4ade80
+        );
+
+    color: white !important;
+
+    font-size: 2.6rem !important;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 15px 32px rgba(34, 197, 94, 0.35);
+
+    animation:
+        successPop 0.7s ease;
+}
+
+
+.payment-success-card h2 {
+    color: #166534 !important;
+
+    font-size: 2.5rem !important;
+
+    font-weight: 900 !important;
+
+    margin-bottom: 10px !important;
+}
+
+
+.payment-success-card h3 {
+    color: #475467 !important;
+
+    font-size: 1.15rem !important;
+
+    font-weight: 600 !important;
+
+    margin-bottom: 28px !important;
+}
+
+
+.payment-amount {
+    display: inline-block;
+
+    margin-bottom: 28px;
+
+    padding: 16px 45px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #dcfce7,
+            #f0fdf4
+        );
+
+    color: #15803d !important;
+
+    font-size: 2.5rem !important;
+
+    font-weight: 900 !important;
+
+    box-shadow:
+        0 10px 25px rgba(34, 197, 94, 0.12);
+}
+
+
+.payment-success-card p {
+    color: #475467 !important;
+
+    font-size: 1.05rem !important;
+
+    font-weight: 600;
+
+    margin: 12px 0 !important;
+}
+
+
+/* ============================================================
+   MONEY RAIN ANIMATION
+   ============================================================ */
+
+.money-rain {
+    position: relative;
+
+    width: 100%;
+
+    height: 0;
+
+    overflow: visible;
+
+    z-index: 1;
+}
+
+
+.money-piece {
+    position: absolute;
+
+    top: -40px;
+
+    display: inline-block;
+
+    animation-name: moneyFall;
+
+    animation-timing-function: ease-in;
+
+    animation-iteration-count: 1;
+
+    animation-fill-mode: forwards;
+
+    filter:
+        drop-shadow(
+            0 5px 7px rgba(0,0,0,0.18)
+        );
+}
+
+
+@keyframes moneyFall {
+
+    0% {
+        transform:
+            translateY(-40px)
+            rotate(0deg);
+
+        opacity: 1;
+    }
+
+    85% {
+        opacity: 1;
+    }
+
+    100% {
+        transform:
+            translateY(430px)
+            rotate(360deg);
+
+        opacity: 0;
+    }
+}
+
+
+/* ============================================================
+   STREAMLIT SUCCESS / ERROR / WARNING BOXES
+   ============================================================ */
+
+[data-testid="stAlert"] {
+    border-radius: 16px !important;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+
+/* ============================================================
+   DIVIDERS
+   ============================================================ */
+
+hr {
+    border: none !important;
+
+    height: 2px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #c7d5ff,
+            #8b5cf6,
+            #c7d5ff,
+            transparent
+        ) !important;
+
+    margin:
+        2rem 0 !important;
+}
+
+
+/* ============================================================
+   SELECT BOX
+   ============================================================ */
+
+[data-testid="stSelectbox"] {
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes heroAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+@keyframes paymentSuccessAppear {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(30px)
+            scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+@keyframes successPop {
+
+    0% {
+        transform: scale(0);
+    }
+
+    70% {
+        transform: scale(1.18);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+@keyframes pulseStep {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 8px rgba(15,77,255,0.08),
+            0 12px 30px rgba(15,77,255,0.40);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 12px rgba(15,77,255,0.04),
+            0 18px 38px rgba(15,77,255,0.52);
+    }
+}
+
+
+@keyframes activeGradient {
+
+    0% {
+        background-position:
+            0% 50%;
+    }
+
+    50% {
+        background-position:
+            100% 50%;
+    }
+
+    100% {
+        background-position:
+            0% 50%;
+    }
+}
+
+
+@keyframes iconFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-7px);
+    }
+}
+
+
+@keyframes trackShine {
+
+    0% {
+        background-position:
+            0% 50%;
+    }
+
+    100% {
+        background-position:
+            100% 50%;
+    }
+}
+
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        transform:
+            scale(1)
+            rotate(0deg);
+
+        opacity: 0.4;
+    }
+
+    50% {
+        transform:
+            scale(1.3)
+            rotate(15deg);
+
+        opacity: 1;
+    }
+}
+
+
+/* ============================================================
+   MOBILE RESPONSIVENESS
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 1rem;
+    }
+
+    .razorpay-quote-section {
+        padding:
+            42px 20px;
+        border-radius: 24px;
+    }
+
+    .razorpay-quote-section h1 {
+        font-size:
+            2.1rem !important;
+    }
+
+    .razorpay-quote-section p {
+        font-size:
+            1rem !important;
+    }
+
+    .step-label {
+        font-size:
+            0.60rem;
+    }
+
+    .step-circle {
+        width: 38px;
+        height: 38px;
+
+        font-size:
+            1rem;
+    }
+
+    .walk-track {
+        height:
+            60px;
+    }
+
+    .walking-figure {
+        font-size:
+            1.8rem;
+
+        top:
+            9px;
+    }
+
+    .walk-caption {
+        font-size:
+            0.72rem;
+
+        right:
+            10px;
+    }
+
+    .feature-card {
+        margin-bottom:
+            15px;
+    }
+
+    .payment-success-card {
+        padding:
+            40px 18px;
+
+        border-radius:
+            24px;
+    }
+
+    .payment-success-card h2 {
+        font-size:
+            1.9rem !important;
+    }
+
+    .payment-amount {
+        font-size:
+            2rem !important;
+
+        padding:
+            14px 28px;
+    }
+
+}
