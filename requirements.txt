@@ -1,4 +1,5 @@
 streamlit
+razorpay
 python-dotenv
 openai
 pandas
