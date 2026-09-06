@@ -4,4 +4,4 @@ python-dotenv
 openai
 pandas
 plotly
-pyttsx3
+

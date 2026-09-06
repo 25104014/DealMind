@@ -4,9 +4,7 @@ import uuid
 import os
 import json
 import random
-
-from dotenv import load_dotenv
-from openai import OpenAI
+import streamlit.components.v1 as components
 
 from core.negotiation import (
     evaluate_deal,
@@ -35,19 +33,11 @@ st.set_page_config(
 
 
 # ============================================================
-# LOAD ENVIRONMENT VARIABLES
-# ============================================================
-
-load_dotenv()
-
-
-# ============================================================
 # LOAD CUSTOM CSS
 # ============================================================
 
 def load_css():
     css_path = os.path.join("assets", "style.css")
-
     if os.path.exists(css_path):
         with open(css_path, "r", encoding="utf-8") as css_file:
             st.markdown(
@@ -64,18 +54,6 @@ load_css()
 # ============================================================
 
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
-
-
-# ============================================================
-# OPENROUTER CONFIGURATION
-# ============================================================
-
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-
-
-# ============================================================
-# FAST TRACK CONFIGURATION
-# ============================================================
 
 AUTO_ACCEPT_BUDGET_THRESHOLD = 68000.0
 
@@ -106,24 +84,20 @@ DEFAULT_SESSION_VALUES = {
     "negotiation_strategy": "Balanced",
     "inventory": 18,
     "max_rounds": 5,
-
     "buyer_budget": 68000.0,
     "buyer_intent": "High",
-
     "buyer_requirement": (
         "I need a reliable laptop for software development."
     ),
-
     "buyer_message": (
         "I need a reliable laptop for software development. "
         "My budget is around ₹68,000, and I'd like to close "
         "the deal today if possible."
-    )
+    ),
 }
 
 
 for key, value in DEFAULT_SESSION_VALUES.items():
-
     if key not in st.session_state:
         st.session_state[key] = value
 
@@ -132,31 +106,17 @@ if "wizard_page" not in st.session_state:
     st.session_state.wizard_page = 0
 
 
-if "success_voice_played" not in st.session_state:
-    st.session_state.success_voice_played = False
-
-
-if "failure_voice_played" not in st.session_state:
-    st.session_state.failure_voice_played = False
-
-
-if "ai_chat_history" not in st.session_state:
-    st.session_state.ai_chat_history = []
-
-
 # ============================================================
 # HELPER FUNCTIONS
 # ============================================================
 
 def close_deal(final_price, reason="Deal successfully accepted."):
-
     st.session_state.deal_status = "ACCEPTED"
     st.session_state.final_price = float(final_price)
     st.session_state.final_reason = reason
 
 
 def reject_deal(reason):
-
     st.session_state.deal_status = "REJECTED"
     st.session_state.final_price = None
     st.session_state.final_reason = reason
@@ -180,37 +140,8 @@ def reset_application():
     )
 
     for key, value in DEFAULT_SESSION_VALUES.items():
-
         if key not in keep_keys:
             st.session_state[key] = value
-
-
-# ============================================================
-# BROWSER VOICE ANNOUNCEMENT
-# ============================================================
-
-def speak_message(message):
-
-    escaped_message = json.dumps(message)
-
-    components.html(
-        f"""
-        <script>
-            window.parent.speechSynthesis.cancel();
-
-            const message = new SpeechSynthesisUtterance(
-                {escaped_message}
-            );
-
-            message.rate = 0.9;
-            message.pitch = 1;
-            message.volume = 1;
-
-            window.parent.speechSynthesis.speak(message);
-        </script>
-        """,
-        height=0
-    )
 
 
 # ============================================================
@@ -220,17 +151,13 @@ def speak_message(message):
 def show_razorpay_checkout(order_id, amount, product_name):
 
     if not RAZORPAY_KEY_ID:
-
         st.error(
             "❌ Razorpay Key ID is missing. "
             "Please configure RAZORPAY_KEY_ID."
         )
-
         return
 
-
     amount_paise = int(float(amount) * 100)
-
 
     checkout_options = {
         "key": RAZORPAY_KEY_ID,
@@ -244,15 +171,11 @@ def show_razorpay_checkout(order_id, amount, product_name):
         }
     }
 
-
     options_json = json.dumps(checkout_options)
-
 
     checkout_html = f"""
     <!DOCTYPE html>
-
     <html>
-
     <head>
 
         <meta
@@ -264,8 +187,7 @@ def show_razorpay_checkout(order_id, amount, product_name):
 
         <style>
 
-            html,
-            body {{
+            html, body {{
                 margin: 0;
                 padding: 0;
                 height: 100%;
@@ -295,6 +217,14 @@ def show_razorpay_checkout(order_id, amount, product_name):
                 font-weight: 700;
                 border-radius: 12px;
                 cursor: pointer;
+                box-shadow:
+                    0 10px 25px
+                    rgba(15, 77, 255, 0.25);
+            }}
+
+            button:hover {{
+                transform: translateY(-2px);
+                transition: 0.2s ease;
             }}
 
             .result-card {{
@@ -309,6 +239,10 @@ def show_razorpay_checkout(order_id, amount, product_name):
                 box-sizing: border-box;
             }}
 
+            .result-card h2 {{
+                margin-top: 0;
+            }}
+
             .field-row {{
                 text-align: left;
                 margin: 14px 0;
@@ -318,7 +252,10 @@ def show_razorpay_checkout(order_id, amount, product_name):
                 display: block;
                 font-size: 12px;
                 font-weight: 700;
+                color: #166534;
                 margin-bottom: 4px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
             }}
 
             .field-with-copy {{
@@ -328,17 +265,34 @@ def show_razorpay_checkout(order_id, amount, product_name):
 
             .field-with-copy input {{
                 flex: 1;
-                padding: 10px;
+                padding: 10px 12px;
                 border-radius: 8px;
                 border: 1px solid #86efac;
+                background: #ffffff;
+                color: #14532d;
+                font-family: monospace;
+                font-size: 13px;
             }}
 
             .copy-btn {{
                 width: auto;
                 min-width: 70px;
-                padding: 10px;
+                padding: 10px 14px;
                 font-size: 13px;
+                font-weight: 700;
+                border-radius: 8px;
                 background: #16a34a;
+                box-shadow: none;
+            }}
+
+            .copy-btn.copied {{
+                background: #15803d;
+            }}
+
+            .hint {{
+                font-size: 13px;
+                color: #166534;
+                margin-top: 4px;
             }}
 
         </style>
@@ -351,11 +305,9 @@ def show_razorpay_checkout(order_id, amount, product_name):
             💳 Proceed to Secure Payment
         </button>
 
-
         <script>
 
             var options = {options_json};
-
 
             options.handler = function(response) {{
 
@@ -368,7 +320,6 @@ def show_razorpay_checkout(order_id, amount, product_name):
                 var signature =
                     response.razorpay_signature || "";
 
-
                 document.body.innerHTML = `
 
                     <div class="result-card">
@@ -378,10 +329,10 @@ def show_razorpay_checkout(order_id, amount, product_name):
                         </h2>
 
                         <p>
-                            Copy the details below and paste them
-                            into the DealMind verification section.
+                            Copy each value below and paste it into the
+                            matching field in DealMind's Payment
+                            Verification section.
                         </p>
-
 
                         <div class="field-row">
 
@@ -392,14 +343,16 @@ def show_razorpay_checkout(order_id, amount, product_name):
                             <div class="field-with-copy">
 
                                 <input
-                                    id="payment-id"
+                                    id="fld-payment-id"
+                                    type="text"
                                     readonly
                                     value="${{paymentId}}"
                                 >
 
                                 <button
+                                    type="button"
                                     class="copy-btn"
-                                    onclick="copyValue('payment-id')"
+                                    data-target="fld-payment-id"
                                 >
                                     Copy
                                 </button>
@@ -407,7 +360,6 @@ def show_razorpay_checkout(order_id, amount, product_name):
                             </div>
 
                         </div>
-
 
                         <div class="field-row">
 
@@ -418,14 +370,16 @@ def show_razorpay_checkout(order_id, amount, product_name):
                             <div class="field-with-copy">
 
                                 <input
-                                    id="order-id"
+                                    id="fld-order-id"
+                                    type="text"
                                     readonly
                                     value="${{orderId}}"
                                 >
 
                                 <button
+                                    type="button"
                                     class="copy-btn"
-                                    onclick="copyValue('order-id')"
+                                    data-target="fld-order-id"
                                 >
                                     Copy
                                 </button>
@@ -433,7 +387,6 @@ def show_razorpay_checkout(order_id, amount, product_name):
                             </div>
 
                         </div>
-
 
                         <div class="field-row">
 
@@ -444,14 +397,16 @@ def show_razorpay_checkout(order_id, amount, product_name):
                             <div class="field-with-copy">
 
                                 <input
-                                    id="signature"
+                                    id="fld-signature"
+                                    type="text"
                                     readonly
                                     value="${{signature}}"
                                 >
 
                                 <button
+                                    type="button"
                                     class="copy-btn"
-                                    onclick="copyValue('signature')"
+                                    data-target="fld-signature"
                                 >
                                     Copy
                                 </button>
@@ -460,30 +415,90 @@ def show_razorpay_checkout(order_id, amount, product_name):
 
                         </div>
 
+                        <p class="hint">
+                            🤝 Once all three are pasted below,
+                            click "Verify Payment" to complete
+                            the transaction.
+                        </p>
+
                     </div>
 
                 `;
 
+                var copyButtons =
+                    document.querySelectorAll(".copy-btn");
+
+                copyButtons.forEach(function(btn) {{
+
+                    btn.addEventListener(
+                        "click",
+                        function() {{
+
+                            var targetId =
+                                btn.getAttribute(
+                                    "data-target"
+                                );
+
+                            var input =
+                                document.getElementById(
+                                    targetId
+                                );
+
+                            input.select();
+
+                            input.setSelectionRange(
+                                0,
+                                99999
+                            );
+
+                            try {{
+                                document.execCommand("copy");
+                            }}
+                            catch (e) {{
+                                navigator.clipboard.writeText(
+                                    input.value
+                                );
+                            }}
+
+                            var originalText =
+                                btn.textContent;
+
+                            btn.textContent =
+                                "Copied!";
+
+                            btn.classList.add(
+                                "copied"
+                            );
+
+                            setTimeout(
+                                function() {{
+                                    btn.textContent =
+                                        originalText;
+
+                                    btn.classList.remove(
+                                        "copied"
+                                    );
+                                }},
+                                1500
+                            );
+
+                        }}
+                    );
+
+                }});
+
             }};
 
-
-            function copyValue(id) {{
-
-                var input =
-                    document.getElementById(id);
-
-                input.select();
-
-                navigator.clipboard.writeText(
-                    input.value
-                );
-
-            }}
-
+            options.modal = {{
+                ondismiss: function() {{
+                    console.log(
+                        "Razorpay checkout closed."
+                    );
+                }}
+            }};
 
             var rzp =
                 new Razorpay(options);
-
 
             document
                 .getElementById("rzp-button")
@@ -492,16 +507,13 @@ def show_razorpay_checkout(order_id, amount, product_name):
                     rzp.open();
 
                     event.preventDefault();
-
                 }};
 
         </script>
 
     </body>
-
     </html>
     """
-
 
     components.html(
         checkout_html,
@@ -519,7 +531,6 @@ def render_walking_buyer(caption):
     st.markdown(
         f"""
         <div class="walk-track">
-
             <div class="walking-figure">
                 🚶‍♂️
             </div>
@@ -527,7 +538,6 @@ def render_walking_buyer(caption):
             <div class="walk-caption">
                 {caption}
             </div>
-
         </div>
         """,
         unsafe_allow_html=True
@@ -544,7 +554,6 @@ def render_money_rain(count=28):
     ]
 
     pieces = []
-
 
     for _ in range(count):
 
@@ -567,65 +576,86 @@ def render_money_rain(count=28):
 
         symbol = random.choice(symbols)
 
-
         pieces.append(
-            f'''
-            <span
-                class="money-piece"
-                style="
-                    left:{left}%;
-                    animation-delay:{delay}s;
-                    animation-duration:{duration}s;
-                    font-size:{size}rem;
-                "
-            >
-                {symbol}
-            </span>
-            '''
+            f'<span class="money-piece" '
+            f'style="left:{left}%; '
+            f'animation-delay:{delay}s; '
+            f'animation-duration:{duration}s; '
+            f'font-size:{size}rem;">'
+            f'{symbol}</span>'
         )
 
-
     st.markdown(
-        f'''
-        <div class="money-rain">
-            {"".join(pieces)}
-        </div>
-        ''',
+        f'<div class="money-rain">'
+        f'{"".join(pieces)}'
+        f'</div>',
         unsafe_allow_html=True
     )
 
 
 # ============================================================
-# WIZARD CONFIGURATION
+# AUTOMATIC VOICE ANNOUNCEMENT
+# ============================================================
+# ONLY CHANGE:
+# pyttsx3 has been replaced with the browser Web Speech API.
+# Nothing is visibly displayed in the Streamlit UI.
+# ============================================================
+
+def speak_message(message):
+
+    safe_message = json.dumps(str(message))
+
+    speech_html = f"""
+    <script>
+
+        window.speechSynthesis.cancel();
+
+        var message =
+            new SpeechSynthesisUtterance(
+                {safe_message}
+            );
+
+        message.rate = 1.0;
+        message.volume = 1.0;
+        message.pitch = 1.0;
+
+        window.speechSynthesis.speak(message);
+
+    </script>
+    """
+
+    components.html(
+        speech_html,
+        height=0,
+        width=0
+    )
+
+
+# ============================================================
+# WIZARD / FRONTEND CONFIGURATION
 # ============================================================
 
 STEPS = [
-
     {
         "icon": "✨",
         "label": "Welcome"
     },
-
     {
         "icon": "🏪",
         "label": "Merchant Setup"
     },
-
     {
         "icon": "🤖",
         "label": "AI Buyer"
     },
-
     {
         "icon": "🤝",
         "label": "Negotiation"
     },
-
     {
         "icon": "💳",
         "label": "Payment & Outcome"
-    }
-
+    },
 ]
 
 
@@ -633,66 +663,100 @@ QUOTES = [
 
     {
         "eyebrow": "TRUST, BUILT IN",
-        "title": "Trust is the currency of modern commerce.",
+
+        "title":
+            "Trust is the currency of modern commerce.",
+
         "body": (
-            "DealMind is a Razorpay-inspired negotiation engine "
-            "where AI-driven conversations meet merchant-grade safety."
+            "DealMind is a Razorpay-inspired negotiation engine — "
+            "where AI-driven conversations meet merchant-grade "
+            "safety, and every transaction ends in confidence."
         ),
+
         "tags": [
             "🧠 AI-Powered Negotiation",
             "🔒 Merchant Protection",
             "💳 Secure Payments"
-        ]
+        ],
     },
 
     {
-        "eyebrow": "STEP 1 · FOUNDATIONS",
-        "title": "Every great deal starts with a protected foundation.",
+        "eyebrow":
+            "STEP 1 · FOUNDATIONS",
+
+        "title":
+            "Every great deal starts with a protected foundation.",
+
         "body": (
-            "Set your pricing, margins and discount limits."
+            "Set your pricing, margins, and discount limits. "
+            "DealMind's safety layer will guard your minimum "
+            "profitability, no matter how the negotiation unfolds."
         ),
+
         "tags": [
             "📊 Clear Economics",
             "🛡️ Guardrailed Discounts"
-        ]
+        ],
     },
 
     {
-        "eyebrow": "STEP 2 · UNDERSTANDING INTENT",
-        "title": "Understanding intent is the first step to a great transaction.",
+        "eyebrow":
+            "STEP 2 · UNDERSTANDING INTENT",
+
+        "title":
+            "Understanding intent is the first step to a great transaction.",
+
         "body": (
-            "Describe your buyer in plain language."
+            "Describe your buyer in plain language. DealMind reads "
+            "budget, urgency and flexibility to negotiate smarter "
+            "on your behalf."
         ),
+
         "tags": [
             "💬 Natural Language",
             "🎯 Intent Detection"
-        ]
+        ],
     },
 
     {
-        "eyebrow": "STEP 3 · THE CONVERSATION",
-        "title": "Where intelligent conversations become confident decisions.",
+        "eyebrow":
+            "STEP 3 · THE CONVERSATION",
+
+        "title":
+            "Where intelligent conversations become confident decisions.",
+
         "body": (
-            "Watch the negotiation unfold round by round."
+            "Watch the negotiation unfold round by round — manually, "
+            "or let DealMind's autonomous agent find a merchant-safe "
+            "offer for you. A budget at or above "
+            f"₹{AUTO_ACCEPT_BUDGET_THRESHOLD:,.0f} fast-tracks straight "
+            "to payment."
         ),
+
         "tags": [
             "🔁 Round-by-Round",
             "⚡ Fast-Track Accept"
-        ]
+        ],
     },
 
     {
-        "eyebrow": "STEP 4 · SETTLEMENT",
-        "title": "Payments that just work — every single time.",
+        "eyebrow":
+            "STEP 4 · SETTLEMENT",
+
+        "title":
+            "Payments that just work — every single time.",
+
         "body": (
-            "Complete the deal using secure payment verification."
+            "Once a deal is struck, take it straight to a secure, "
+            "Razorpay-powered checkout and verify the transaction "
+            "end to end."
         ),
+
         "tags": [
             "🔒 Signature Verified",
-            "⚡ Secure Payment"
-        ]
-    }
-
+            "⚡ Instant Settlement"
+        ],
+    },
 ]
 
 
@@ -700,12 +764,10 @@ def render_quote_banner(step_index):
 
     quote = QUOTES[step_index]
 
-
     tags_html = "<span>•</span>".join(
         f"<div class='tag-pill'>{tag}</div>"
         for tag in quote["tags"]
     )
-
 
     st.markdown(
         f"""
@@ -744,15 +806,12 @@ def render_stepper():
 
     current = st.session_state.wizard_page
 
-
     st.markdown(
         '<div class="stepper-wrapper">',
         unsafe_allow_html=True
     )
 
-
     cols = st.columns(len(STEPS))
-
 
     for i, (col, step) in enumerate(
         zip(cols, STEPS)
@@ -761,19 +820,12 @@ def render_stepper():
         with col:
 
             state_class = (
-
                 "done"
-
                 if i < current
-
                 else "active"
-
                 if i == current
-
                 else "upcoming"
-
             )
-
 
             st.markdown(
                 f"""
@@ -792,15 +844,12 @@ def render_stepper():
                 unsafe_allow_html=True
             )
 
-
             if st.button(
                 " ",
                 key=f"step_jump_{i}",
                 help=f"Go to {step['label']}"
             ):
-
                 go_to_page(i)
-
 
     st.markdown(
         '</div>',
@@ -815,13 +864,14 @@ def render_nav_buttons(
     next_help=None
 ):
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
+    st.markdown(
+        "<br>",
+        unsafe_allow_html=True
+    )
 
     col_back, col_spacer, col_next = st.columns(
         [1, 3, 1]
     )
-
 
     with col_back:
 
@@ -834,11 +884,9 @@ def render_nav_buttons(
                 "← Back",
                 use_container_width=True
             ):
-
                 go_to_page(
                     st.session_state.wizard_page - 1
                 )
-
 
     with col_next:
 
@@ -854,35 +902,54 @@ def render_nav_buttons(
                 disabled=not next_enabled,
                 help=next_help
             ):
-
                 go_to_page(
                     st.session_state.wizard_page + 1
                 )
 
 
 # ============================================================
-# SESSION VARIABLES
+# MIRROR SESSION-STATE INPUTS INTO LOCAL VARIABLES
 # ============================================================
 
 product_name = st.session_state.product_name
+
 selling_price = st.session_state.selling_price
-max_discount_percent = st.session_state.max_discount_percent
+
+max_discount_percent = (
+    st.session_state.max_discount_percent
+)
+
 product_cost = st.session_state.product_cost
-minimum_price = st.session_state.minimum_price
-negotiation_strategy = st.session_state.negotiation_strategy
+
+minimum_price = (
+    st.session_state.minimum_price
+)
+
+negotiation_strategy = (
+    st.session_state.negotiation_strategy
+)
+
 inventory = st.session_state.inventory
+
 max_rounds = st.session_state.max_rounds
+
 buyer_budget = st.session_state.buyer_budget
+
 buyer_intent = st.session_state.buyer_intent
-buyer_requirement = st.session_state.buyer_requirement
+
+buyer_requirement = (
+    st.session_state.buyer_requirement
+)
+
 buyer_message = st.session_state.buyer_message
 
 
 discount_based_minimum = (
     selling_price
-    * (1 - max_discount_percent / 100)
+    * (
+        1 - max_discount_percent / 100
+    )
 )
-
 
 effective_minimum_price = max(
     minimum_price,
@@ -892,7 +959,7 @@ effective_minimum_price = max(
 
 
 # ============================================================
-# STEPPER NAVIGATION
+# STEPPER NAV
 # ============================================================
 
 render_stepper()
@@ -912,64 +979,55 @@ if st.session_state.wizard_page == 0:
         "A buyer just walked in, ready to negotiate…"
     )
 
-
-    st.markdown("### What DealMind does")
-
+    st.markdown(
+        "### What DealMind does"
+    )
 
     c1, c2, c3 = st.columns(3)
-
 
     with c1:
 
         st.markdown(
-            """
-            <div class="feature-card">
-                <div class="feature-icon">🏪</div>
-                <h4>Merchant-Safe Pricing</h4>
-                <p>Set a floor price the AI can never cross.</p>
-            </div>
-            """,
+            '<div class="feature-card">'
+            '<div class="feature-icon">🏪</div>'
+            '<h4>Merchant-Safe Pricing</h4>'
+            '<p>Set a floor price the AI can never cross.</p>'
+            '</div>',
             unsafe_allow_html=True
         )
-
 
     with c2:
 
         st.markdown(
-            """
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h4>AI-Understood Buyers</h4>
-                <p>Natural language turned into buyer intent.</p>
-            </div>
-            """,
+            '<div class="feature-card">'
+            '<div class="feature-icon">🤖</div>'
+            '<h4>AI-Understood Buyers</h4>'
+            '<p>Natural language turned into structured buyer intent.</p>'
+            '</div>',
             unsafe_allow_html=True
         )
-
 
     with c3:
 
         st.markdown(
-            """
-            <div class="feature-card">
-                <div class="feature-icon">💳</div>
-                <h4>Secure Checkout</h4>
-                <p>Razorpay-powered payment verification.</p>
-            </div>
-            """,
+            '<div class="feature-card">'
+            '<div class="feature-icon">💳</div>'
+            '<h4>Secure Checkout</h4>'
+            '<p>Razorpay-powered payment, verified end to end.</p>'
+            '</div>',
             unsafe_allow_html=True
         )
 
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
+    st.markdown(
+        "<br>",
+        unsafe_allow_html=True
+    )
 
     if st.button(
         "🚀 Get Started",
         type="primary",
         use_container_width=True
     ):
-
         go_to_page(1)
 
 
@@ -979,11 +1037,11 @@ if st.session_state.wizard_page == 0:
 
 elif st.session_state.wizard_page == 1:
 
-    st.header("🏪 Merchant Configuration")
-
+    st.header(
+        "🏪 Merchant Configuration"
+    )
 
     col1, col2 = st.columns(2)
-
 
     with col1:
 
@@ -992,14 +1050,12 @@ elif st.session_state.wizard_page == 1:
             key="product_name"
         )
 
-
         st.number_input(
             "Selling Price (₹)",
             min_value=1.0,
             step=1000.0,
             key="selling_price"
         )
-
 
         st.number_input(
             "Maximum Discount Allowed (%)",
@@ -1008,7 +1064,6 @@ elif st.session_state.wizard_page == 1:
             step=1.0,
             key="max_discount_percent"
         )
-
 
     with col2:
 
@@ -1019,14 +1074,12 @@ elif st.session_state.wizard_page == 1:
             key="product_cost"
         )
 
-
         st.number_input(
             "Minimum Acceptable Price (₹)",
             min_value=1.0,
             step=1000.0,
             key="minimum_price"
         )
-
 
         st.selectbox(
             "Merchant Negotiation Goal",
@@ -1038,14 +1091,12 @@ elif st.session_state.wizard_page == 1:
             key="negotiation_strategy"
         )
 
-
     st.number_input(
         "Inventory Available",
         min_value=0,
         step=1,
         key="inventory"
     )
-
 
     st.number_input(
         "Maximum Negotiation Rounds",
@@ -1055,16 +1106,13 @@ elif st.session_state.wizard_page == 1:
         key="max_rounds"
     )
 
-
     discount_based_minimum = (
         st.session_state.selling_price
         * (
             1
-            - st.session_state.max_discount_percent
-            / 100
+            - st.session_state.max_discount_percent / 100
         )
     )
-
 
     effective_minimum_price = max(
         st.session_state.minimum_price,
@@ -1072,20 +1120,18 @@ elif st.session_state.wizard_page == 1:
         st.session_state.product_cost
     )
 
-
     normal_profit = (
         st.session_state.selling_price
         - st.session_state.product_cost
     )
 
-
     st.divider()
 
-    st.header("📊 Merchant Economics")
-
+    st.header(
+        "📊 Merchant Economics"
+    )
 
     c1, c2, c3, c4 = st.columns(4)
-
 
     with c1:
 
@@ -1094,14 +1140,12 @@ elif st.session_state.wizard_page == 1:
             f"₹{st.session_state.selling_price:,.0f}"
         )
 
-
     with c2:
 
         st.metric(
             "Product Cost",
             f"₹{st.session_state.product_cost:,.0f}"
         )
-
 
     with c3:
 
@@ -1110,7 +1154,6 @@ elif st.session_state.wizard_page == 1:
             f"₹{normal_profit:,.0f}"
         )
 
-
     with c4:
 
         st.metric(
@@ -1118,16 +1161,31 @@ elif st.session_state.wizard_page == 1:
             f"₹{effective_minimum_price:,.0f}"
         )
 
-
     st.info(
         f"""
 🔒 **Merchant Safety Protection**
 
 DealMind will not accept a deal below
 **₹{effective_minimum_price:,.0f}**.
+
+The AI can recommend a price, but the merchant
+safety layer independently protects profitability.
 """
     )
 
+    if (
+        st.session_state.buyer_budget
+        < effective_minimum_price
+    ):
+
+        st.warning(
+            f"⚠️ The AI Buyer's current budget "
+            f"(₹{st.session_state.buyer_budget:,.0f}) "
+            f"is below your protected minimum "
+            f"(₹{effective_minimum_price:,.0f}). "
+            "Adjust either value on the next step "
+            "for the negotiation to succeed."
+        )
 
     render_nav_buttons(
         back_enabled=False
@@ -1135,21 +1193,20 @@ DealMind will not accept a deal below
 
 
 # ============================================================
-# PAGE 2 — AI BUYER
+# PAGE 2 — AI BUYER SIMULATOR
 # ============================================================
 
 elif st.session_state.wizard_page == 2:
 
-    st.header("🤖 AI Buyer Simulator")
-
+    st.header(
+        "🤖 AI Buyer Simulator"
+    )
 
     render_walking_buyer(
         "Reading the buyer's intent…"
     )
 
-
     col1, col2 = st.columns(2)
-
 
     with col1:
 
@@ -1159,7 +1216,6 @@ elif st.session_state.wizard_page == 2:
             step=1000.0,
             key="buyer_budget"
         )
-
 
     with col2:
 
@@ -1173,12 +1229,10 @@ elif st.session_state.wizard_page == 2:
             key="buyer_intent"
         )
 
-
     st.text_area(
         "Buyer's Requirement",
         key="buyer_requirement"
     )
-
 
     st.text_area(
         "💬 Natural Language Buyer Request",
@@ -1186,6 +1240,12 @@ elif st.session_state.wizard_page == 2:
         height=120
     )
 
+    st.caption(
+        f"💡 A budget of "
+        f"₹{AUTO_ACCEPT_BUDGET_THRESHOLD:,.0f} "
+        "or more fast-tracks straight to payment "
+        "on the Negotiation step."
+    )
 
     if st.button(
         "🧠 Analyze Buyer with AI",
@@ -1198,12 +1258,15 @@ elif st.session_state.wizard_page == 2:
 
             try:
 
-                analysis = understand_buyer_message(
-                    st.session_state.buyer_message
+                analysis = (
+                    understand_buyer_message(
+                        st.session_state.buyer_message
+                    )
                 )
 
-                st.session_state.buyer_analysis = analysis
-
+                st.session_state.buyer_analysis = (
+                    analysis
+                )
 
             except Exception as error:
 
@@ -1211,37 +1274,27 @@ elif st.session_state.wizard_page == 2:
                     f"AI analysis failed:\n\n{error}"
                 )
 
-
     if st.session_state.buyer_analysis:
 
         st.subheader(
             "🧠 DealMind's Understanding of the Buyer"
         )
 
-
         analysis = (
             st.session_state.buyer_analysis
         )
 
-
-        detected_budget = analysis.get(
-            "budget"
+        detected_budget = (
+            analysis.get("budget")
         )
 
-
-        if detected_budget is not None:
-
-            budget_display = (
-                f"₹{float(detected_budget):,.0f}"
-            )
-
-        else:
-
-            budget_display = "Not detected"
-
+        budget_display = (
+            f"₹{float(detected_budget):,.0f}"
+            if detected_budget is not None
+            else "Not detected"
+        )
 
         c1, c2, c3 = st.columns(3)
-
 
         with c1:
 
@@ -1249,7 +1302,6 @@ elif st.session_state.wizard_page == 2:
                 "Detected Budget",
                 budget_display
             )
-
 
         with c2:
 
@@ -1261,7 +1313,6 @@ elif st.session_state.wizard_page == 2:
                 )
             )
 
-
         with c3:
 
             st.metric(
@@ -1272,7 +1323,6 @@ elif st.session_state.wizard_page == 2:
                 )
             )
 
-
         st.write(
             "**Requirement:**",
             analysis.get(
@@ -1281,6 +1331,21 @@ elif st.session_state.wizard_page == 2:
             )
         )
 
+        preferences = (
+            analysis.get(
+                "preferences",
+                []
+            )
+        )
+
+        st.write(
+            "**Preferences:**",
+            (
+                ", ".join(preferences)
+                if preferences
+                else "None detected"
+            )
+        )
 
     render_nav_buttons()
 
@@ -1291,16 +1356,15 @@ elif st.session_state.wizard_page == 2:
 
 elif st.session_state.wizard_page == 3:
 
-    st.header("🤝 Negotiation Room")
-
+    st.header(
+        "🤝 Negotiation Room"
+    )
 
     render_walking_buyer(
         "The negotiation is live…"
     )
 
-
     col1, col2 = st.columns(2)
-
 
     with col1:
 
@@ -1310,7 +1374,6 @@ elif st.session_state.wizard_page == 3:
             use_container_width=True
         )
 
-
     with col2:
 
         reset_button = st.button(
@@ -1318,13 +1381,11 @@ elif st.session_state.wizard_page == 3:
             use_container_width=True
         )
 
-
     if reset_button:
 
         reset_application()
 
         st.rerun()
-
 
     if start_button:
 
@@ -1333,7 +1394,6 @@ elif st.session_state.wizard_page == 3:
             reject_deal(
                 "Product is currently out of stock."
             )
-
 
         elif (
             buyer_budget
@@ -1345,43 +1405,58 @@ elif st.session_state.wizard_page == 3:
                 selling_price
             )
 
-
             fast_track_price = max(
                 fast_track_price,
                 effective_minimum_price
             )
 
-
             st.session_state.negotiation_started = True
+
             st.session_state.round_number = 1
 
+            st.session_state.payment_order = None
+
+            st.session_state.payment_status = (
+                "NOT_CREATED"
+            )
 
             st.session_state.conversation = [
 
                 {
                     "speaker": "AI Buyer",
+
                     "message": (
-                        f"My budget is ₹{buyer_budget:,.0f}. "
-                        "Let's close this deal quickly."
+                        f"My budget is "
+                        f"₹{buyer_budget:,.0f} — "
+                        f"that's above your fast-track "
+                        f"threshold, let's close this "
+                        f"quickly."
                     )
                 },
 
                 {
                     "speaker": "DealMind",
+
                     "message": (
-                        f"Deal accepted at "
-                        f"₹{fast_track_price:,.0f}."
+                        f"Great news — deal auto-accepted "
+                        f"at ₹{fast_track_price:,.0f}."
                     )
                 }
 
             ]
 
-
             close_deal(
                 fast_track_price,
-                "Buyer qualified for fast-track acceptance."
-            )
 
+                (
+                    f"Buyer's budget "
+                    f"(₹{buyer_budget:,.0f}) "
+                    f"met or exceeded the "
+                    f"₹{AUTO_ACCEPT_BUDGET_THRESHOLD:,.0f} "
+                    f"fast-track threshold — "
+                    "deal auto-accepted."
+                )
+            )
 
         else:
 
@@ -1391,62 +1466,128 @@ elif st.session_state.wizard_page == 3:
 
             st.session_state.conversation = []
 
-            st.session_state.deal_status = "NEGOTIATING"
+            st.session_state.deal_status = (
+                "NEGOTIATING"
+            )
 
             st.session_state.final_price = None
 
-            st.session_state.current_offer = buyer_budget
+            st.session_state.final_reason = ""
 
+            st.session_state.payment_order = None
+
+            st.session_state.payment_status = (
+                "NOT_CREATED"
+            )
+
+            st.session_state.current_offer = (
+                buyer_budget
+            )
 
             st.session_state.conversation.append(
                 {
                     "speaker": "AI Buyer",
+
                     "message": (
                         f"My maximum budget is "
                         f"₹{buyer_budget:,.0f}. "
-                        "Can you give me a better deal?"
+                        f"Can you give me a better deal?"
                     )
                 }
             )
 
-
         st.rerun()
-
 
     if st.session_state.negotiation_started:
 
         st.divider()
 
-        st.header("📍 Deal Status")
+        st.header(
+            "📍 Deal Status"
+        )
 
-
-        status = st.session_state.deal_status
-
+        status = (
+            st.session_state.deal_status
+        )
 
         if status == "NEGOTIATING":
 
-            st.warning("🟡 NEGOTIATING")
-
+            st.markdown(
+                '<div class="status-badge '
+                'status-negotiating">'
+                '🟡 NEGOTIATING'
+                '</div>',
+                unsafe_allow_html=True
+            )
 
         elif status == "ACCEPTED":
 
-            st.success("🟢 DEAL ACCEPTED")
-
+            st.markdown(
+                '<div class="status-badge '
+                'status-accepted">'
+                '🟢 DEAL ACCEPTED'
+                '</div>',
+                unsafe_allow_html=True
+            )
 
         elif status == "REJECTED":
 
-            st.error("🔴 DEAL REJECTED")
-
+            st.markdown(
+                '<div class="status-badge '
+                'status-rejected">'
+                '🔴 DEAL REJECTED'
+                '</div>',
+                unsafe_allow_html=True
+            )
 
     if (
         st.session_state.negotiation_started
-        and st.session_state.deal_status == "NEGOTIATING"
+        and st.session_state.deal_status == "ACCEPTED"
+        and st.session_state.conversation
     ):
 
         st.divider()
 
-        st.header("🎯 Initial Deal Analysis")
+        st.header(
+            "💬 Deal Conversation"
+        )
 
+        for message in (
+            st.session_state.conversation
+        ):
+
+            if (
+                message["speaker"]
+                == "AI Buyer"
+            ):
+
+                st.chat_message(
+                    "user"
+                ).write(
+                    f"🤖 **AI Buyer:** "
+                    f"{message['message']}"
+                )
+
+            else:
+
+                st.chat_message(
+                    "assistant"
+                ).write(
+                    f"🧠 **DealMind:** "
+                    f"{message['message']}"
+                )
+
+    if (
+        st.session_state.negotiation_started
+        and st.session_state.deal_status
+        == "NEGOTIATING"
+    ):
+
+        st.divider()
+
+        st.header(
+            "🎯 Initial Deal Analysis"
+        )
 
         result = evaluate_deal(
             selling_price=selling_price,
@@ -1457,9 +1598,7 @@ elif st.session_state.wizard_page == 3:
             buyer_intent=buyer_intent
         )
 
-
         decision = result["decision"]
-
 
         if decision == "ACCEPT":
 
@@ -1468,14 +1607,12 @@ elif st.session_state.wizard_page == 3:
                 f"₹{result['offer_price']:,.0f}"
             )
 
-
         elif decision == "COUNTER":
 
             st.warning(
                 f"Recommended counter offer: "
                 f"₹{result['offer_price']:,.0f}"
             )
-
 
         else:
 
@@ -1484,58 +1621,143 @@ elif st.session_state.wizard_page == 3:
                 "satisfy merchant requirements."
             )
 
+            st.caption(
+                "💡 Tip: go back to Merchant Setup "
+                "or AI Buyer and raise the buyer's "
+                "budget (or lower the protected minimum) "
+                "so the offer clears the bar."
+            )
 
         st.write(
             f"**Reason:** {result['reason']}"
         )
 
-
         st.divider()
 
-        st.header("💬 Live Negotiation")
+        st.header(
+            "💬 Live Negotiation"
+        )
 
+        for message in (
+            st.session_state.conversation
+        ):
+
+            if (
+                message["speaker"]
+                == "AI Buyer"
+            ):
+
+                st.chat_message(
+                    "user"
+                ).write(
+                    f"🤖 **AI Buyer:** "
+                    f"{message['message']}"
+                )
+
+            else:
+
+                st.chat_message(
+                    "assistant"
+                ).write(
+                    f"🧠 **DealMind:** "
+                    f"{message['message']}"
+                )
+
+        if (
+            st.session_state.round_number
+            > max_rounds
+        ):
+
+            reject_deal(
+                "Maximum negotiation rounds reached "
+                "without agreement."
+            )
+
+            st.rerun()
 
         buyer_counter = st.number_input(
-            (
-                f"AI Buyer's Counter Offer — "
-                f"Round {st.session_state.round_number} "
-                f"of {max_rounds} (₹)"
-            ),
+            f"AI Buyer's Counter Offer — Round "
+            f"{st.session_state.round_number} "
+            f"of {max_rounds} (₹)",
+
             min_value=0.0,
+
             value=float(
                 st.session_state.current_offer
                 if st.session_state.current_offer
                 else buyer_budget
             ),
-            step=500.0
-        )
 
+            step=500.0,
+
+            key=(
+                f"buyer_counter_"
+                f"{st.session_state.round_number}"
+            )
+        )
 
         if st.button(
             "💬 Submit Buyer Offer",
             use_container_width=True
         ):
 
+            st.session_state.conversation.append(
+                {
+                    "speaker": "AI Buyer",
+
+                    "message": (
+                        f"I can pay "
+                        f"₹{buyer_counter:,.0f}."
+                    )
+                }
+            )
+
             result = negotiate_round(
-                current_offer=st.session_state.current_offer,
+                current_offer=(
+                    st.session_state.current_offer
+                ),
+
                 buyer_budget=buyer_counter,
-                minimum_price=effective_minimum_price,
+
+                minimum_price=(
+                    effective_minimum_price
+                ),
+
                 product_cost=product_cost,
+
                 buyer_intent=buyer_intent,
+
                 inventory=inventory
             )
 
-
-            if result["status"] == "ACCEPTED":
+            if (
+                result["status"]
+                == "ACCEPTED"
+            ):
 
                 final_price = result["offer"]
 
+                st.session_state.conversation.append(
+                    {
+                        "speaker": "DealMind",
+
+                        "message": (
+                            f"Deal accepted at "
+                            f"₹{final_price:,.0f}."
+                        )
+                    }
+                )
 
                 close_deal(
                     final_price,
-                    "Buyer and merchant reached a mutually acceptable price."
+
+                    (
+                        "Buyer and merchant reached "
+                        "a mutually acceptable price."
+                    )
                 )
 
+                st.rerun()
 
             else:
 
@@ -1543,19 +1765,26 @@ elif st.session_state.wizard_page == 3:
                     result["offer"]
                 )
 
+                st.session_state.conversation.append(
+                    {
+                        "speaker": "DealMind",
+
+                        "message": (
+                            f"My counter-offer is "
+                            f"₹{result['offer']:,.0f}."
+                        )
+                    }
+                )
 
                 st.session_state.round_number += 1
 
-
-            st.rerun()
-
+                st.rerun()
 
         st.divider()
 
         st.header(
             "🤖 DealMind Autonomous Negotiation"
         )
-
 
         if st.button(
             "🚀 Run AI Negotiation",
@@ -1568,22 +1797,32 @@ elif st.session_state.wizard_page == 3:
                 intent=buyer_intent
             )
 
-
             with st.spinner(
-                "DealMind is calculating the optimal offer..."
+                "DealMind is calculating the optimal "
+                "merchant-safe offer..."
             ):
 
                 negotiation_result = (
                     buyer.recommend_merchant_offer(
                         buyer_message=buyer_message,
+
                         selling_price=selling_price,
+
                         product_cost=product_cost,
-                        minimum_price=effective_minimum_price,
-                        current_buyer_offer=buyer_budget,
-                        strategy=negotiation_strategy
+
+                        minimum_price=(
+                            effective_minimum_price
+                        ),
+
+                        current_buyer_offer=(
+                            buyer_budget
+                        ),
+
+                        strategy=(
+                            negotiation_strategy
+                        )
                     )
                 )
-
 
             recommended_offer = float(
                 negotiation_result.get(
@@ -1592,18 +1831,53 @@ elif st.session_state.wizard_page == 3:
                 )
             )
 
-
             decision = negotiation_result.get(
                 "decision",
                 "COUNTER"
             )
-
 
             reason = negotiation_result.get(
                 "reason",
                 "No explanation provided."
             )
 
+            confidence = float(
+                negotiation_result.get(
+                    "confidence",
+                    0
+                )
+            )
+
+            st.subheader(
+                "🧠 AI Recommendation"
+            )
+
+            c1, c2, c3 = st.columns(3)
+
+            with c1:
+
+                st.metric(
+                    "Buyer Budget",
+                    f"₹{buyer_budget:,.0f}"
+                )
+
+            with c2:
+
+                st.metric(
+                    "Recommended Offer",
+                    f"₹{recommended_offer:,.0f}"
+                )
+
+            with c3:
+
+                st.metric(
+                    "AI Confidence",
+                    f"{confidence * 100:.0f}%"
+                )
+
+            st.info(
+                f"**AI Reason:** {reason}"
+            )
 
             guardrail_passed = (
 
@@ -1621,16 +1895,21 @@ elif st.session_state.wizard_page == 3:
 
             )
 
-
             if guardrail_passed:
 
                 if decision == "ACCEPT":
 
                     close_deal(
                         recommended_offer,
-                        "AI recommendation passed merchant safety constraints."
+
+                        (
+                            "AI recommendation passed "
+                            "all merchant safety "
+                            "constraints."
+                        )
                     )
 
+                    st.rerun()
 
                 else:
 
@@ -1638,73 +1917,86 @@ elif st.session_state.wizard_page == 3:
                         recommended_offer
                     )
 
-                    st.success(
-                        f"Counter offer recommended: "
-                        f"₹{recommended_offer:,.0f}"
+                    st.session_state.conversation.append(
+                        {
+                            "speaker": "DealMind",
+
+                            "message": (
+                                f"I can offer "
+                                f"₹{recommended_offer:,.0f}. "
+                                f"{reason}"
+                            )
+                        }
                     )
 
+                    st.success(
+                        "Merchant safety checks passed. "
+                        "A counter offer has been added."
+                    )
 
             else:
 
                 reject_deal(
-                    "AI recommendation was blocked by merchant safety constraints."
+                    "The AI recommendation was blocked "
+                    "by the independent merchant safety "
+                    "constraints."
                 )
 
-
-            st.rerun()
-
+                st.rerun()
 
     negotiation_done = (
         st.session_state.deal_status
-        in (
-            "ACCEPTED",
-            "REJECTED"
+        in ("ACCEPTED", "REJECTED")
+    )
+
+    render_nav_buttons(
+        next_enabled=negotiation_done,
+
+        next_label="Go to Payment →",
+
+        next_help=(
+            None
+            if negotiation_done
+            else (
+                "Reach a deal outcome first "
+                "(accepted or rejected)."
+            )
         )
     )
 
 
-    render_nav_buttons(
-        next_enabled=negotiation_done,
-        next_label="Go to Payment →"
-    )
-
-
 # ============================================================
-# PAGE 4 — PAYMENT
+# PAGE 4 — PAYMENT & OUTCOME
 # ============================================================
 
 elif st.session_state.wizard_page == 4:
 
-    if st.session_state.deal_status == "ACCEPTED":
+    if (
+        st.session_state.deal_status
+        == "ACCEPTED"
+    ):
 
-        st.header("🎉 Final Deal Summary")
-
+        st.header(
+            "🎉 Final Deal Summary"
+        )
 
         final_price = (
             st.session_state.final_price
         )
 
-
         final_profit = (
-            final_price
-            - product_cost
+            final_price - product_cost
         )
-
 
         discount_amount = (
-            selling_price
-            - final_price
+            selling_price - final_price
         )
 
-
         discount_percent = (
-            discount_amount
-            / selling_price
+            discount_amount / selling_price
         ) * 100
 
-
         c1, c2, c3, c4 = st.columns(4)
-
 
         with c1:
 
@@ -1713,14 +2005,12 @@ elif st.session_state.wizard_page == 4:
                 f"₹{final_price:,.0f}"
             )
 
-
         with c2:
 
             st.metric(
                 "Merchant Profit",
                 f"₹{final_profit:,.0f}"
             )
-
 
         with c3:
 
@@ -1729,7 +2019,6 @@ elif st.session_state.wizard_page == 4:
                 f"{discount_percent:.1f}%"
             )
 
-
         with c4:
 
             st.metric(
@@ -1737,16 +2026,25 @@ elif st.session_state.wizard_page == 4:
                 st.session_state.round_number
             )
 
-
         st.divider()
 
-        st.header("💳 Secure Payment")
-
+        st.header(
+            "💳 Secure Payment"
+        )
 
         if (
             st.session_state.payment_status
             == "NOT_CREATED"
         ):
+
+            render_walking_buyer(
+                "Heading to the checkout counter…"
+            )
+
+            st.info(
+                "The deal is complete and ready "
+                "for secure payment."
+            )
 
             if st.button(
                 "💳 Create Razorpay Payment Order",
@@ -1759,7 +2057,6 @@ elif st.session_state.wizard_page == 4:
                     f"{uuid.uuid4().hex[:12]}"
                 )
 
-
                 with st.spinner(
                     "Creating secure payment order..."
                 ):
@@ -1770,7 +2067,6 @@ elif st.session_state.wizard_page == 4:
                             receipt=receipt
                         )
                     )
-
 
                 if payment_result["success"]:
 
@@ -1784,7 +2080,6 @@ elif st.session_state.wizard_page == 4:
 
                     st.rerun()
 
-
                 else:
 
                     st.session_state.payment_status = (
@@ -1795,7 +2090,6 @@ elif st.session_state.wizard_page == 4:
                         payment_result["error"]
                     )
 
-
         elif (
             st.session_state.payment_status
             == "ORDER_CREATED"
@@ -1804,7 +2098,6 @@ elif st.session_state.wizard_page == 4:
             order = (
                 st.session_state.payment_order
             )
-
 
             st.success(
                 f"""
@@ -1816,13 +2109,11 @@ Payment order created successfully.
 """
             )
 
-
             show_razorpay_checkout(
                 order_id=order["order_id"],
                 amount=order["amount"],
                 product_name=product_name
             )
-
 
             st.divider()
 
@@ -1830,22 +2121,33 @@ Payment order created successfully.
                 "🔐 Payment Verification"
             )
 
-
-            razorpay_payment_id = st.text_input(
-                "Razorpay Payment ID"
+            st.caption(
+                "After successful payment, enter "
+                "the Razorpay response details "
+                "below to verify the transaction."
             )
 
-
-            razorpay_order_id = st.text_input(
-                "Razorpay Order ID",
-                value=order["order_id"]
+            razorpay_payment_id = (
+                st.text_input(
+                    "Razorpay Payment ID",
+                    key="verify_payment_id"
+                )
             )
 
-
-            razorpay_signature = st.text_input(
-                "Razorpay Signature"
+            razorpay_order_id = (
+                st.text_input(
+                    "Razorpay Order ID",
+                    value=order["order_id"],
+                    key="verify_order_id"
+                )
             )
 
+            razorpay_signature = (
+                st.text_input(
+                    "Razorpay Signature",
+                    key="verify_signature"
+                )
+            )
 
             if st.button(
                 "🔐 Verify Payment",
@@ -1867,6 +2169,9 @@ Payment order created successfully.
                         )
                     )
 
+                    st.session_state.payment_verification_result = (
+                        verification_result
+                    )
 
                     if verification_result["success"]:
 
@@ -1876,20 +2181,19 @@ Payment order created successfully.
 
                         st.rerun()
 
-
                     else:
 
                         st.error(
-                            "❌ Verification failed."
+                            "❌ Verification failed: "
+                            f"{verification_result.get('error')}"
                         )
-
 
                 else:
 
                     st.warning(
-                        "Please enter all payment details."
+                        "Please enter all payment "
+                        "verification details."
                     )
-
 
         elif (
             st.session_state.payment_status
@@ -1900,6 +2204,14 @@ Payment order created successfully.
                 st.session_state.payment_order
             )
 
+            if (
+                "success_voice_played"
+                not in st.session_state
+            ):
+
+                st.session_state.success_voice_played = (
+                    False
+                )
 
             if (
                 not st.session_state.success_voice_played
@@ -1907,29 +2219,49 @@ Payment order created successfully.
 
                 speak_message(
                     "Payment successful. Your transaction "
-                    "has been completed and verified successfully. "
-                    "Thank you for choosing DealMind."
+                    "has been completed and verified "
+                    "successfully. Thank you for choosing "
+                    "DealMind."
                 )
 
-                st.session_state.success_voice_played = True
-
+                st.session_state.success_voice_played = (
+                    True
+                )
 
             render_money_rain()
 
-
-            st.success(
+            st.markdown(
                 f"""
-🎉 Payment Verified Successfully!
+                <div class="payment-success-card">
 
-Transaction Completed
+                    <div class="success-icon">
+                        ✓
+                    </div>
 
-Amount: ₹{order['amount']:,.0f}
+                    <h2>
+                        🎉 Payment Verified Successfully!
+                    </h2>
 
-🔒 Razorpay payment signature verified
-🤝 Your DealMind transaction is complete
-"""
+                    <h3>
+                        Transaction Completed
+                    </h3>
+
+                    <div class="payment-amount">
+                        ₹{order['amount']:,.0f}
+                    </div>
+
+                    <p>
+                        🔒 Razorpay payment signature verified
+                    </p>
+
+                    <p>
+                        🤝 Your DealMind transaction is complete
+                    </p>
+
+                </div>
+                """,
+                unsafe_allow_html=True
             )
-
 
         elif (
             st.session_state.payment_status
@@ -1937,27 +2269,41 @@ Amount: ₹{order['amount']:,.0f}
         ):
 
             if (
+                "failure_voice_played"
+                not in st.session_state
+            ):
+
+                st.session_state.failure_voice_played = (
+                    False
+                )
+
+            if (
                 not st.session_state.failure_voice_played
             ):
 
                 speak_message(
-                    "Sorry, your payment could not be completed. "
-                    "Please check your payment details and try again."
+                    "Sorry, your payment could not be "
+                    "completed. Please check your payment "
+                    "details and try again."
                 )
 
-                st.session_state.failure_voice_played = True
-
+                st.session_state.failure_voice_played = (
+                    True
+                )
 
             st.error(
                 "🔴 Payment order creation failed. "
                 "Please check your Razorpay configuration."
             )
 
+    elif (
+        st.session_state.deal_status
+        == "REJECTED"
+    ):
 
-    elif st.session_state.deal_status == "REJECTED":
-
-        st.header("❌ Deal Summary")
-
+        st.header(
+            "❌ Deal Summary"
+        )
 
         st.error(
             f"""
@@ -1969,20 +2315,39 @@ Amount: ₹{order['amount']:,.0f}
 """
         )
 
+        st.caption(
+            "💡 Tip: go back and raise the buyer's "
+            "budget, lower the merchant's minimum price, "
+            "or increase the allowed discount, then "
+            "try again."
+        )
 
     else:
 
         st.info(
-            "Complete the negotiation on the previous step."
+            "Complete the negotiation on the previous "
+            "step to reach a deal outcome."
         )
-
 
     render_nav_buttons()
 
 
 # ============================================================
 # AI DOUBT CLARIFICATION CHATBOT
+# APPENDED FEATURE — OPENROUTER AI
 # ============================================================
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+
+load_dotenv()
+
+
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY"
+)
+
 
 def get_ai_answer(user_question):
 
@@ -1990,9 +2355,8 @@ def get_ai_answer(user_question):
 
         return (
             "⚠️ OpenRouter API key is missing. "
-            "Please configure OPENROUTER_API_KEY."
+            "Please check your .env file."
         )
-
 
     try:
 
@@ -2002,7 +2366,6 @@ def get_ai_answer(user_question):
             ),
             api_key=OPENROUTER_API_KEY
         )
-
 
         completion = (
             client.chat.completions.create(
@@ -2016,22 +2379,25 @@ def get_ai_answer(user_question):
 
                         "content": (
                             "You are DealMind AI Assistant. "
-                            "You help users with DealMind, AI, "
-                            "programming, negotiation, Razorpay, "
-                            "payments and general questions."
+                            "You help users by answering "
+                            "questions clearly and accurately. "
+                            "You can answer questions about "
+                            "DealMind, AI, programming, "
+                            "negotiation, Razorpay, payments, "
+                            "and general topics."
                         )
                     },
 
                     {
                         "role": "user",
-                        "content": user_question
+
+                        "content":
+                            user_question
                     }
 
                 ]
-
             )
         )
-
 
         return (
             completion
@@ -2039,7 +2405,6 @@ def get_ai_answer(user_question):
             .message
             .content
         )
-
 
     except Exception as error:
 
@@ -2049,10 +2414,11 @@ def get_ai_answer(user_question):
 
 
 # ============================================================
-# AI CHAT INTERFACE
+# AI CHAT USER INTERFACE
 # ============================================================
 
 st.divider()
+
 
 st.markdown(
     "## 🤖 AI Doubt Clarification Assistant"
@@ -2061,18 +2427,36 @@ st.markdown(
 
 st.caption(
     "Ask any question about DealMind, AI, programming, "
-    "negotiation, payments or any general doubt."
+    "negotiation, payments, or any general doubt."
 )
 
 
-for message in st.session_state.ai_chat_history:
+# Initialize chat history
 
-    with st.chat_message(message["role"]):
+if (
+    "ai_chat_history"
+    not in st.session_state
+):
+
+    st.session_state.ai_chat_history = []
+
+
+# Display previous messages
+
+for message in (
+    st.session_state.ai_chat_history
+):
+
+    with st.chat_message(
+        message["role"]
+    ):
 
         st.write(
             message["content"]
         )
 
+
+# User input
 
 user_question = st.chat_input(
     "Ask your doubt here..."
@@ -2088,13 +2472,11 @@ if user_question:
         }
     )
 
-
     with st.chat_message("user"):
 
         st.write(
             user_question
         )
-
 
     with st.chat_message("assistant"):
 
@@ -2110,7 +2492,6 @@ if user_question:
                 ai_answer
             )
 
-
     st.session_state.ai_chat_history.append(
         {
             "role": "assistant",
@@ -2119,7 +2500,11 @@ if user_question:
     )
 
 
-if st.button("🗑️ Clear AI Chat"):
+# Clear chat
+
+if st.button(
+    "🗑️ Clear AI Chat"
+):
 
     st.session_state.ai_chat_history = []
 
